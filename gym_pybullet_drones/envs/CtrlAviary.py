@@ -81,10 +81,16 @@ class CtrlAviary(BaseAviary):
         #### Action vector ######## P0            P1            P2            P3
         act_lower_bound = np.array([0.,           0.,           0.,           0.])
         act_upper_bound = np.array([self.MAX_RPM, self.MAX_RPM, self.MAX_RPM, self.MAX_RPM])
+        
+        if self.DRONE_MODEL == DroneModel.HA:
+            act_lower_bound = np.array([0.,           0.])
+            act_upper_bound = np.array([self.MAX_RPM, self.MAX_RPM])
         return spaces.Dict({str(i): spaces.Box(low=act_lower_bound,
                                                high=act_upper_bound,
                                                dtype=np.float32
                                                ) for i in range(self.NUM_DRONES)})
+        
+        
     
     ################################################################################
 
@@ -101,6 +107,9 @@ class CtrlAviary(BaseAviary):
         #### Observation vector ### X        Y        Z       Q1   Q2   Q3   Q4   R       P       Y       VX       VY       VZ       WX       WY       WZ       P0            P1            P2            P3
         obs_lower_bound = np.array([-np.inf, -np.inf, 0.,     -1., -1., -1., -1., -np.pi, -np.pi, -np.pi, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf, 0.,           0.,           0.,           0.])
         obs_upper_bound = np.array([np.inf,  np.inf,  np.inf, 1.,  1.,  1.,  1.,  np.pi,  np.pi,  np.pi,  np.inf,  np.inf,  np.inf,  np.inf,  np.inf,  np.inf,  self.MAX_RPM, self.MAX_RPM, self.MAX_RPM, self.MAX_RPM])
+        if self.DRONE_MODEL == DroneModel.HA:
+            obs_lower_bound = np.array([-np.inf, -np.inf, 0.,     -1., -1., -1., -1., -np.pi, -np.pi, -np.pi, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf, 0.,           0.])
+            obs_upper_bound = np.array([np.inf,  np.inf,  np.inf, 1.,  1.,  1.,  1.,  np.pi,  np.pi,  np.pi,  np.inf,  np.inf,  np.inf,  np.inf,  np.inf,  np.inf,  self.MAX_RPM, self.MAX_RPM])
         return spaces.Dict({str(i): spaces.Dict({"state": spaces.Box(low=obs_lower_bound,
                                                                      high=obs_upper_bound,
                                                                      dtype=np.float32
@@ -148,6 +157,8 @@ class CtrlAviary(BaseAviary):
 
         """
         clipped_action = np.zeros((self.NUM_DRONES, 4))
+        if self.DRONE_MODEL == DroneModel.HA:
+            clipped_action = np.zeros((self.NUM_DRONES, 2))
         for k, v in action.items():
             clipped_action[int(k), :] = np.clip(np.array(v), 0, self.MAX_RPM)
         return clipped_action
@@ -165,6 +176,9 @@ class CtrlAviary(BaseAviary):
             Dummy value.
 
         """
+        
+        
+        # return state[2]/10.  # Alternative reward space, see PR #32
         return -1
 
     ################################################################################

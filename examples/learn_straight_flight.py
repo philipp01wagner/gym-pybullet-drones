@@ -17,26 +17,26 @@ It is not meant as a good/effective learning example.
 
 """
 import time
-import argparse
 import gym
 import numpy as np
-from stable_baselines3 import A2C
+from stable_baselines3 import A2C, PPO
 from stable_baselines3.a2c import MlpPolicy
 from stable_baselines3.common.env_checker import check_env
-import ray
-from ray.tune import register_env
-from ray.rllib.agents import ppo
+from gym_pybullet_drones.envs.single_agent_rl.StraightFlightAviary import StraightFlightAviary
 
 from gym_pybullet_drones.utils.Logger import Logger
 from gym_pybullet_drones.envs.single_agent_rl.TakeoffAviary import TakeoffAviary
-from gym_pybullet_drones.utils.utils import sync, str2bool
+from gym_pybullet_drones.utils.utils import sync
+from gym.envs.registration import register
 
 if __name__ == "__main__":
 
-    #### Define and parse (optional) arguments for the script ##
-    parser = argparse.ArgumentParser(description='Single agent reinforcement learning example script using TakeoffAviary')
-    parser.add_argument('--rllib',      default=False,        type=str2bool,       help='Whether to use RLlib PPO in place of stable-baselines A2C (default: False)', metavar='')
-    ARGS = parser.parse_args()
+    register(
+    id='straight-flight-aviary-v0',
+    entry_point='gym_pybullet_drones.envs.single_agent_rl:StraightFlightAviary',
+    reward_threshold=1.0,
+    nondeterministic = False,
+)
 
     #### Check the environment's spaces ########################
     env = gym.make("straight-flight-aviary-v0")
@@ -48,34 +48,15 @@ if __name__ == "__main__":
               )
 
     #### Train the model #######################################
-    if not ARGS.rllib:
-        model = A2C(MlpPolicy,
+    model = PPO(MlpPolicy,
                     env,
-                    verbose=1
+                    verbose=1,
+                    batch_size=128,
                     )
-        model.learn(total_timesteps=10000) # Typically not enough
-    else:
-        ray.shutdown()
-        ray.init(ignore_reinit_error=True)
-        register_env("takeoff-aviary-v0", lambda _: TakeoffAviary())
-        config = ppo.DEFAULT_CONFIG.copy()
-        config["num_workers"] = 2
-        config["framework"] = "torch"
-        config["env"] = "takeoff-aviary-v0"
-        agent = ppo.PPOTrainer(config)
-        for i in range(3): # Typically not enough
-            results = agent.train()
-            print("[INFO] {:d}: episode_reward max {:f} min {:f} mean {:f}".format(i,
-                                                                                   results["episode_reward_max"],
-                                                                                   results["episode_reward_min"],
-                                                                                   results["episode_reward_mean"]
-                                                                                   )
-                  )
-        policy = agent.get_policy()
-        ray.shutdown()
+    model.learn(total_timesteps=100000) # Typically not enough
 
     #### Show (and record a video of) the model's performance ##
-    env = TakeoffAviary(gui=True,
+    env = StraightFlightAviary(gui=True,
                         record=False
                         )
     logger = Logger(logging_freq_hz=int(env.SIM_FREQ/env.AGGR_PHY_STEPS),
@@ -84,16 +65,14 @@ if __name__ == "__main__":
     obs = env.reset()
     start = time.time()
     for i in range(3*env.SIM_FREQ):
-        if not ARGS.rllib:
-            action, _states = model.predict(obs,
+        action, _states = model.predict(obs,
                                             deterministic=True
                                             )
-        else:
-            action, _states, _dict = policy.compute_single_action(obs)
+
         obs, reward, done, info = env.step(action)
         logger.log(drone=0,
                    timestamp=i/env.SIM_FREQ,
-                   state=np.hstack([obs[0:3], np.zeros(4), obs[3:15],  np.resize(action, (4))]),
+                   state=np.hstack([obs[0:3], np.zeros(4), obs[3:15],  np.resize(action, (2))]),
                    control=np.zeros(12)
                    )
         if i%env.SIM_FREQ == 0:

@@ -43,7 +43,7 @@ class Logger(object):
         self.counters = np.zeros(num_drones)
         self.timestamps = np.zeros((num_drones, duration_sec*self.LOGGING_FREQ_HZ))
         #### Note: this is the suggest information to log ##############################
-        self.states = np.zeros((num_drones, 16, duration_sec*self.LOGGING_FREQ_HZ)) #### 16 states: pos_x,
+        self.states = np.zeros((num_drones, 14, duration_sec*self.LOGGING_FREQ_HZ)) #### 16 states: pos_x,
                                                                                                   # pos_y,
                                                                                                   # pos_z,
                                                                                                   # vel_x,
@@ -101,7 +101,7 @@ class Logger(object):
         #### Add rows to the matrices if a counter exceeds their size
         if current_counter >= self.timestamps.shape[1]:
             self.timestamps = np.concatenate((self.timestamps, np.zeros((self.NUM_DRONES, 1))), axis=1)
-            self.states = np.concatenate((self.states, np.zeros((self.NUM_DRONES, 16, 1))), axis=2)
+            self.states = np.concatenate((self.states, np.zeros((self.NUM_DRONES, 14, 1))), axis=2)
             self.controls = np.concatenate((self.controls, np.zeros((self.NUM_DRONES, 12, 1))), axis=2)
         #### Advance a counter is the matrices have overgrown it ###
         elif not self.PREALLOCATED_ARRAYS and self.timestamps.shape[1] > current_counter:
@@ -109,6 +109,7 @@ class Logger(object):
         #### Log the information and increase the counter ##########
         self.timestamps[drone, current_counter] = timestamp
         #### Re-order the kinematic obs (of most Aviaries) #########
+        print(self.states.shape, np.hstack([state[0:3], state[10:13], state[7:10], state[13:20]]).shape)
         self.states[drone, :, current_counter] = np.hstack([state[0:3], state[10:13], state[7:10], state[13:20]])
         self.controls[drone, :, current_counter] = control
         self.counters[drone] = current_counter + 1
@@ -338,7 +339,7 @@ class Logger(object):
         else:
             axs[row, col].set_ylabel('RPM1')
         row = 8
-        for j in range(self.NUM_DRONES):
+        """for j in range(self.NUM_DRONES):
             axs[row, col].plot(t, self.states[j, 14, :], label="drone_"+str(j))
         axs[row, col].set_xlabel('time')
         if pwm:
@@ -352,7 +353,7 @@ class Logger(object):
         if pwm:
             axs[row, col].set_ylabel('PWM3')
         else:
-            axs[row, col].set_ylabel('RPM3')
+            axs[row, col].set_ylabel('RPM3')"""
 
         #### Drawing options #######################################
         for i in range (10):

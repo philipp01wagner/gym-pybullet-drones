@@ -21,6 +21,7 @@ class ActionType(Enum):
     ONE_D_RPM = "one_d_rpm"     # 1D (identical input to all motors) with RPMs
     ONE_D_DYN = "one_d_dyn"     # 1D (identical input to all motors) with desired thrust and torques
     ONE_D_PID = "one_d_pid"     # 1D (identical input to all motors) with PID control
+    HA = "ha"
 
 ################################################################################
 
@@ -37,7 +38,7 @@ class BaseSingleAgentAviary(BaseAviary):
     ################################################################################
 
     def __init__(self,
-                 drone_model: DroneModel=DroneModel.CF2X,
+                 drone_model: DroneModel=DroneModel.HA,
                  initial_xyzs=None,
                  initial_rpys=None,
                  physics: Physics=Physics.PYB,
@@ -181,6 +182,8 @@ class BaseSingleAgentAviary(BaseAviary):
             size = 3
         elif self.ACT_TYPE in [ActionType.ONE_D_RPM, ActionType.ONE_D_DYN, ActionType.ONE_D_PID]:
             size = 1
+        elif self.ACT_TYPE == ActionType.HA:
+            size = 2
         else:
             print("[ERROR] in BaseSingleAgentAviary._actionSpace()")
             exit()
@@ -291,6 +294,8 @@ class BaseSingleAgentAviary(BaseAviary):
                                                  target_pos=state[0:3]+0.1*np.array([0,0,action[0]])
                                                  )
             return rpm
+        elif self.ACT_TYPE == ActionType.HA:
+            return np.array(self.HOVER_RPM * (1+0.05*action))
         else:
             print("[ERROR] in BaseSingleAgentAviary._preprocessAction()")
 
