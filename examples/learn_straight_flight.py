@@ -19,9 +19,11 @@ It is not meant as a good/effective learning example.
 import time
 import gym
 import numpy as np
-from stable_baselines3 import A2C, PPO
+from stable_baselines3 import A2C, PPO, DDPG, SAC
+#from stable_baselines3.ddpg import MlpPolicy
 from stable_baselines3.a2c import MlpPolicy
 from stable_baselines3.common.env_checker import check_env
+from stable_baselines3.common.vec_env import VecCheckNan, DummyVecEnv
 from gym_pybullet_drones.envs.single_agent_rl.StraightFlightAviary import StraightFlightAviary
 
 from gym_pybullet_drones.utils.Logger import Logger
@@ -40,6 +42,7 @@ if __name__ == "__main__":
 
     #### Check the environment's spaces ########################
     env = gym.make("straight-flight-aviary-v0")
+
     print("[INFO] Action space:", env.action_space)
     print("[INFO] Observation space:", env.observation_space)
     check_env(env,
@@ -48,12 +51,12 @@ if __name__ == "__main__":
               )
 
     #### Train the model #######################################
-    model = PPO(MlpPolicy,
+    model = DDPG("MlpPolicy",
                     env,
                     verbose=1,
-                    batch_size=128,
+                    tensorboard_log="./a2c_StraightFlight_tensorboard/"
                     )
-    model.learn(total_timesteps=100000) # Typically not enough
+    model.learn(total_timesteps=1000000) # Typically not enough
 
     #### Show (and record a video of) the model's performance ##
     env = StraightFlightAviary(gui=True,
@@ -64,7 +67,7 @@ if __name__ == "__main__":
                     )
     obs = env.reset()
     start = time.time()
-    for i in range(3*env.SIM_FREQ):
+    for i in range(20*env.SIM_FREQ):
         action, _states = model.predict(obs,
                                             deterministic=True
                                             )

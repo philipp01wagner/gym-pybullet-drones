@@ -712,8 +712,8 @@ class BaseAviary(gym.Env):
             The ordinal number/position of the desired drone in list self.DRONE_IDS.
 
         """
-        forces = np.array(rpm**2)*self.KF
-        torques = np.array(rpm**2)*self.KM
+        forces = np.sign(rpm) * np.array(rpm**2)*self.KF
+        torques = np.sign(rpm) * np.array(rpm**2)*self.KM
         if self.DRONE_MODEL == DroneModel.HA:
             x_torque = -torques[0] + torques[1]
         else:

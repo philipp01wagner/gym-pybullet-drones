@@ -175,7 +175,7 @@ if __name__ == "__main__":
                                                                        # target_pos=INIT_XYZS[j, :] + TARGET_POS[wp_counters[j], :],
                                                                        target_rpy=INIT_RPYS[j, :]
                                                                        )"""
-                action[str(j)] = np.array([0, 0])
+                action[str(j)] = np.array([-200, -200])
 
             #### Go to the next way point and loop #####################
             for j in range(ARGS.num_drones): 
