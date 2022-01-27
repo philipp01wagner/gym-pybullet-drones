@@ -429,17 +429,4 @@ TSWLatexianTemp*
 # option is specified. Footnotes are the stored in a file with suffix Notes.bib.
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
-examples/a2c_StraightFlight_tensorboard/A2C_1/events.out.tfevents.1639522159.Mac-mini.local.54506.0
-examples/a2c_StraightFlight_tensorboard/A2C_2/events.out.tfevents.1639522696.Mac-mini.local.55606.0
-examples/a2c_StraightFlight_tensorboard/A2C_3/events.out.tfevents.1639523199.Mac-mini.local.55786.0
-examples/a2c_StraightFlight_tensorboard/A2C_4/events.out.tfevents.1639572291.Mac-mini.local.4137.0
-examples/a2c_StraightFlight_tensorboard/A2C_5/events.out.tfevents.1639572337.Mac-mini.local.4159.0
-examples/a2c_StraightFlight_tensorboard/DDPG_1/events.out.tfevents.1639523250.Mac-mini.local.55827.0
-examples/a2c_StraightFlight_tensorboard/DDPG_2/events.out.tfevents.1639565011.Mac-mini.local.56815.0
-examples/a2c_StraightFlight_tensorboard/DDPG_3/events.out.tfevents.1639570472.Mac-mini.local.3934.0
-examples/a2c_StraightFlight_tensorboard/DDPG_4/events.out.tfevents.1639582439.Mac-mini.local.5029.0
-examples/a2c_StraightFlight_tensorboard/DDPG_5/events.out.tfevents.1639582481.Mac-mini.local.5051.0
-examples/a2c_StraightFlight_tensorboard/PPO_1/events.out.tfevents.1639575401.Mac-mini.local.4296.0
-examples/a2c_StraightFlight_tensorboard/PPO_2/events.out.tfevents.1639575421.Mac-mini.local.4318.0
-examples/a2c_StraightFlight_tensorboard/SAC_1/events.out.tfevents.1639576098.Mac-mini.local.4438.0
-examples/a2c_StraightFlight_tensorboard/SAC_2/events.out.tfevents.1639581859.Mac-mini.local.4972.0
+examples/a2c_StraightFlight_tensorboard/
