@@ -295,7 +295,8 @@ class BaseSingleAgentAviary(BaseAviary):
                                                  )
             return rpm
         elif self.ACT_TYPE == ActionType.HA:
-            return np.array(self.HOVER_RPM * (1+0.05*action))
+            #return np.array(self.HOVER_RPM * (1+0.05*action))
+            return np.array(self.HOVER_RPM * (0.05*action))
         else:
             print("[ERROR] in BaseSingleAgentAviary._preprocessAction()")
 
