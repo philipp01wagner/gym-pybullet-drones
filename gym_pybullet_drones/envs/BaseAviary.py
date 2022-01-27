@@ -499,7 +499,8 @@ class BaseAviary(gym.Env):
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### Set PyBullet's parameters #############################
-        p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
+        #p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
+        p.setGravity(0, 0, 0, physicsClientId=self.CLIENT)
         p.setRealTimeSimulation(0, physicsClientId=self.CLIENT)
         p.setTimeStep(self.TIMESTEP, physicsClientId=self.CLIENT)
         p.setAdditionalSearchPath(pybullet_data.getDataPath(), physicsClientId=self.CLIENT)
@@ -715,7 +716,7 @@ class BaseAviary(gym.Env):
         forces = np.sign(rpm) * np.array(rpm**2)*self.KF
         torques = np.sign(rpm) * np.array(rpm**2)*self.KM
         if self.DRONE_MODEL == DroneModel.HA:
-            x_torque = -torques[0] + torques[1]
+            x_torque = torques[0] + torques[1]
         else:
             z_torque = (-torques[0] + torques[1] - torques[2] + torques[3])
         
@@ -731,13 +732,14 @@ class BaseAviary(gym.Env):
                                 )
         if self.DRONE_MODEL== DroneModel.HA:
             for i in range(2):
+
                 p.applyExternalForce(self.DRONE_IDS[nth_drone],
                                     i,
                                     forceObj=[forces[i], 0, 0],
                                     posObj=[0, 0, 0],
                                     flags=p.LINK_FRAME,
                                     physicsClientId=self.CLIENT
-                                    )
+                                )
             p.applyExternalTorque(self.DRONE_IDS[nth_drone],
                                 4,
                                 torqueObj=[x_torque, 0, 0],
@@ -897,6 +899,7 @@ class BaseAviary(gym.Env):
             thrust = np.array([0, 0, np.sum(forces)])
         thrust_world_frame = np.dot(rotation, thrust)
         force_world_frame = thrust_world_frame - np.array([0, 0, self.GRAVITY])
+        #force_world_frame = thrust_world_frame
         
         if self.DRONE_MODEL==DroneModel.CF2X:
             x_torque = (forces[0] + forces[1] - forces[2] - forces[3]) * (self.L/np.sqrt(2))
