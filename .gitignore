@@ -430,3 +430,4 @@ TSWLatexianTemp*
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
 examples/a2c_StraightFlight_tensorboard/
+logs_colab/
