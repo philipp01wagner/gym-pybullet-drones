@@ -431,3 +431,4 @@ TSWLatexianTemp*
 #*Notes.bib
 examples/a2c_StraightFlight_tensorboard/
 logs_colab/
+*.zip
