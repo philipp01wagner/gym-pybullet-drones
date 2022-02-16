@@ -74,7 +74,7 @@ class StraightFlightAviary(BaseSingleAgentAviary):
         """
         state = self._getDroneStateVector(0)
         # return state[2]/10.  # Alternative reward space, see PR #32
-        return - (20 - state[1])**2
+        return state[0]
 
     ################################################################################
     
