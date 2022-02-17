@@ -8,7 +8,6 @@ import pybullet as p
 from gym_pybullet_drones.envs.single_agent_rl.StraightFlightAviary import StraightFlightAviary
 
 from gym_pybullet_drones.envs.BaseAviary import DroneModel, Physics
-from gym_pybullet_drones.utils.Logger import Logger
 from gym_pybullet_drones.utils.utils import sync
 from gym.envs.registration import register
 from gym_pybullet_drones.utils.utils import sync, str2bool#
@@ -42,7 +41,8 @@ if __name__ == "__main__":
                         initial_rpys=INIT_RPYS,
                         physics=ARGS.physics,
                         freq=ARGS.simulation_freq_hz,
-                        aggregate_phy_steps=AGGR_PHY_STEPS
+                        aggregate_phy_steps=AGGR_PHY_STEPS,
+                        duration_sec=ARGS.duration_sec
                         )
 
     PYB_CLIENT = env.getPyBulletClient()
@@ -51,22 +51,14 @@ if __name__ == "__main__":
                     env,
                     verbose=1
                     )"""
-    model = A2C.load("a2c_model2")
+    model = A2C.load("a2c_model3")
 
-    
-    logger = Logger(logging_freq_hz=int(env.SIM_FREQ/env.AGGR_PHY_STEPS),
-                    num_drones=1
-                    )
     #obs = env.reset()
     action = np.array([0,0])
     start = time.time()
-    for i in range(20*env.SIM_FREQ):
-        obs, reward, done, info = env.step(100*action)
-        logger.log(drone=0,
-                   timestamp=i/env.SIM_FREQ,
-                   state=np.hstack([obs[0:3], np.zeros(4), obs[3:15],  np.resize(action, (2))]),
-                   control=np.zeros(12)
-                   )
+    for i in range(200*env.SIM_FREQ):
+        obs, reward, done, info = env.step(action)
+
         if i%env.SIM_FREQ == 0:
             env.render()
             print(done)
@@ -78,7 +70,6 @@ if __name__ == "__main__":
                                             deterministic=True
                                             )
 
-        print(action)
+        print(obs[0])
         
     env.close()
-    logger.plot()
