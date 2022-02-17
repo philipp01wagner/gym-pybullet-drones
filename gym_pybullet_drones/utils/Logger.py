@@ -95,7 +95,7 @@ class Logger(object):
             (12,)-shaped array of floats containing the drone's control target.
 
         """
-        if drone < 0 or drone >= self.NUM_DRONES or timestamp < 0 or len(state) != 20 or len(control) != 12:
+        if drone < 0 or drone >= self.NUM_DRONES or timestamp < 0 or len(state) != 14 or len(control) != 12:
             print("[ERROR] in Logger.log(), invalid data")
         current_counter = int(self.counters[drone])
         #### Add rows to the matrices if a counter exceeds their size
@@ -109,7 +109,6 @@ class Logger(object):
         #### Log the information and increase the counter ##########
         self.timestamps[drone, current_counter] = timestamp
         #### Re-order the kinematic obs (of most Aviaries) #########
-        print(self.states.shape, np.hstack([state[0:3], state[10:13], state[7:10], state[13:20]]).shape)
         self.states[drone, :, current_counter] = np.hstack([state[0:3], state[10:13], state[7:10], state[13:20]])
         self.controls[drone, :, current_counter] = control
         self.counters[drone] = current_counter + 1
