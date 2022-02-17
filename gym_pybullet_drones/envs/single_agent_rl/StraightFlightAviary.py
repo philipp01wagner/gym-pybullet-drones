@@ -19,7 +19,8 @@ class StraightFlightAviary(BaseSingleAgentAviary):
                  gui=False,
                  record=False, 
                  obs: ObservationType=ObservationType.KIN,
-                 act: ActionType=ActionType.HA
+                 act: ActionType=ActionType.HA,
+                 duration_sec: int=12
                  ):
         """Initialization of a single agent RL environment.
 
@@ -58,7 +59,8 @@ class StraightFlightAviary(BaseSingleAgentAviary):
                          gui=gui,
                          record=record,
                          obs=obs,
-                         act=act
+                         act=act,
+                         duration_sec=duration_sec
                          )
 
     ################################################################################
@@ -74,7 +76,7 @@ class StraightFlightAviary(BaseSingleAgentAviary):
         """
         state = self._getDroneStateVector(0)
         # return state[2]/10.  # Alternative reward space, see PR #32
-        return state[0]
+        return -(state[0]-0.01)**2
 
     ################################################################################
     
