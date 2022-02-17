@@ -51,7 +51,7 @@ if __name__ == "__main__":
                     env,
                     verbose=1
                     )"""
-    model = A2C.load("a2c_model3")
+    model = A2C.load("a2c_model6")
 
     #obs = env.reset()
     action = np.array([0,0])
@@ -70,7 +70,7 @@ if __name__ == "__main__":
                                             deterministic=True
                                             )
 
-        print(obs[0])
-        print(reward)
+        print("X: ", obs[0])
+        print("Reward: ", reward)
         
     env.close()
