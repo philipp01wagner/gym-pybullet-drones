@@ -2,7 +2,7 @@ import time
 import gym
 import numpy as np
 import argparse
-from stable_baselines3 import A2C, PPO, DDPG, SAC
+from stable_baselines3 import A2C, PPO, DDPG, SAC, TD3
 from stable_baselines3.common.env_checker import check_env
 import pybullet as p
 from gym_pybullet_drones.envs.single_agent_rl.StraightFlightAviary import StraightFlightAviary
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument('--aggregate',          default=True,       type=str2bool,      help='Whether to aggregate physics steps (default: True)', metavar='')
     parser.add_argument('--simulation_freq_hz', default=240,        type=int,           help='Simulation frequency in Hz (default: 240)', metavar='')
     parser.add_argument('--control_freq_hz',    default=48,         type=int,           help='Control frequency in Hz (default: 48)', metavar='')
-    parser.add_argument('--duration_sec',       default=20,         type=int,           help='Duration of the simulation in seconds (default: 5)', metavar='')
+    parser.add_argument('--duration_sec',       default=200,         type=int,           help='Duration of the simulation in seconds (default: 5)', metavar='')
     parser.add_argument('--trajectory',         default=1,          type=int,           help='Trajectory type (default: 1)', metavar='')
     parser.add_argument('--wind',               default=False,      type=str2bool,      help='Whether to enable wind (default: False)', metavar='')
     parser.add_argument('--record_video',       default=False,      type=str2bool,      help='Whether to record a video (default: False)', metavar='')
@@ -51,7 +51,7 @@ if __name__ == "__main__":
                     env,
                     verbose=1
                     )"""
-    model = A2C.load("a2c_model6")
+    model = TD3.load("td3_model2")
 
     #obs = env.reset()
     action = np.array([0,0])
