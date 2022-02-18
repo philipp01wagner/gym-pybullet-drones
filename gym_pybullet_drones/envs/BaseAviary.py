@@ -496,6 +496,7 @@ class BaseAviary(gym.Env):
         self.rpy = np.zeros((self.NUM_DRONES, 3))
         self.vel = np.zeros((self.NUM_DRONES, 3))
         self.ang_v = np.zeros((self.NUM_DRONES, 3))
+
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### Set PyBullet's parameters #############################
@@ -536,6 +537,27 @@ class BaseAviary(gym.Env):
             self.pos[i], self.quat[i] = p.getBasePositionAndOrientation(self.DRONE_IDS[i], physicsClientId=self.CLIENT)
             self.rpy[i] = p.getEulerFromQuaternion(self.quat[i])
             self.vel[i], self.ang_v[i] = p.getBaseVelocity(self.DRONE_IDS[i], physicsClientId=self.CLIENT)
+
+            #r2d2Vel = pb.getBaseVelocity(r2d2Id)
+            #r2d2Pos, r2d2Orn = pb.getBasePositionAndOrientation(r2d2Id)
+            #r2d2ornEuler = pb.getEulerFromQuaternion(r2d2Orn)
+
+            yaw = self.rpy[i][2]
+
+            # I noticed this first in the link mentioned in my first post.
+            # this is a "basic rotation around Z
+            # see https://en.wikipedia.org/wiki/Rotation_matrix "Basic Rotations"
+            rot_around_z = np.array(
+                [[np.cos(-yaw), -np.sin(-yaw), 0],
+                [np.sin(-yaw), np.cos(-yaw), 0],
+                [		0,			 0, 1]]
+            )
+
+            # once we have that, we want to see what the world-frame rotations
+            # are translated via rot_around_z
+            wx, wy, wz = np.dot(rot_around_z, self.ang_v[i])
+
+            self.ang_v[i] = wx, wy, wz
     
     ################################################################################
 
