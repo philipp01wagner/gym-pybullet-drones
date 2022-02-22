@@ -13,6 +13,12 @@ from gym.envs.registration import register
 from gym_pybullet_drones.utils.utils import sync, str2bool#
 
 
+def find_alg_name(alg):
+    s = str(alg)
+    ind1 = s[::-1].find(".")
+    name = s[-ind1:-2]
+    return name
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Helix flight script using CtrlAviary or VisionAviary and DSLPIDControl')
@@ -26,8 +32,16 @@ if __name__ == "__main__":
     parser.add_argument('--trajectory',         default=1,          type=int,           help='Trajectory type (default: 1)', metavar='')
     parser.add_argument('--wind',               default=False,      type=str2bool,      help='Whether to enable wind (default: False)', metavar='')
     parser.add_argument('--record_video',       default=False,      type=str2bool,      help='Whether to record a video (default: False)', metavar='')
+    parser.add_argument('--policy_path',        default="",         type=str,           help='path to the policy zip file', metavar='')
 
     ARGS = parser.parse_args()
+    policy_name = ARGS.policy_path
+
+    algs = [A2C, PPO, SAC, DDPG, TD3]
+
+
+    algorithm = [a for a in algs if find_alg_name(a).lower() in policy_name][0]
+
 
     H = 1.0
     R = .3
@@ -47,11 +61,8 @@ if __name__ == "__main__":
 
     PYB_CLIENT = env.getPyBulletClient()
     p.setGravity(0,0,0)
-    """model = A2C("MlpPolicy",
-                    env,
-                    verbose=1
-                    )"""
-    model = TD3.load("td3_model2")
+
+    model = algorithm.load(policy_name)
 
     #obs = env.reset()
     action = np.array([0,0])
@@ -70,7 +81,7 @@ if __name__ == "__main__":
                                             deterministic=True
                                             )
 
-        print("X: ", obs[0])
-        print("Reward: ", reward)
+#        print("X: ", obs[0])
+#        print("Reward: ", reward)
         
     env.close()
