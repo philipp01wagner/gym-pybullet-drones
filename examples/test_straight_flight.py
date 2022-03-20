@@ -11,6 +11,7 @@ from gym_pybullet_drones.envs.BaseAviary import DroneModel, Physics
 from gym_pybullet_drones.utils.utils import sync
 from gym.envs.registration import register
 from gym_pybullet_drones.utils.utils import sync, str2bool#
+import matplotlib.pyplot as plt
 
 
 def find_alg_name(alg):
@@ -27,8 +28,8 @@ if __name__ == "__main__":
     parser.add_argument('--gui',                default=False,       type=str2bool,      help='Whether to use PyBullet GUI (default: True)', metavar='')
     parser.add_argument('--aggregate',          default=True,       type=str2bool,      help='Whether to aggregate physics steps (default: True)', metavar='')
     parser.add_argument('--simulation_freq_hz', default=240,        type=int,           help='Simulation frequency in Hz (default: 240)', metavar='')
-    parser.add_argument('--control_freq_hz',    default=48,         type=int,           help='Control frequency in Hz (default: 48)', metavar='')
-    parser.add_argument('--duration_sec',       default=200,         type=int,           help='Duration of the simulation in seconds (default: 5)', metavar='')
+    parser.add_argument('--control_freq_hz',    default=24,         type=int,           help='Control frequency in Hz (default: 48)', metavar='')
+    parser.add_argument('--duration_sec',       default=24,         type=int,           help='Duration of the simulation in seconds (default: 5)', metavar='')
     parser.add_argument('--trajectory',         default=1,          type=int,           help='Trajectory type (default: 1)', metavar='')
     parser.add_argument('--wind',               default=False,      type=str2bool,      help='Whether to enable wind (default: False)', metavar='')
     parser.add_argument('--record_video',       default=False,      type=str2bool,      help='Whether to record a video (default: False)', metavar='')
@@ -61,13 +62,16 @@ if __name__ == "__main__":
 
     PYB_CLIENT = env.getPyBulletClient()
     p.setGravity(0,0,0)
+    p.loadURDF("duck_vhacd.urdf", [1.0, 0, 0.2], p.getQuaternionFromEuler([0,0,0]), physicsClientId=PYB_CLIENT)
+
 
     model = algorithm.load(policy_name)
 
     #obs = env.reset()
     action = np.array([0,0])
     start = time.time()
-    for i in range(200*env.SIM_FREQ):
+    rew = []
+    for i in range(ARGS.duration_sec*ARGS.control_freq_hz):
         obs, reward, done, info = env.step(action)
 
         if i%env.SIM_FREQ == 0:
@@ -81,7 +85,11 @@ if __name__ == "__main__":
                                             deterministic=True
                                             )
 
-#        print("X: ", obs[0])
-#        print("Reward: ", reward)
+        print("X: ", obs[0])
+        print("Reward: ", reward)
+        rew.append(reward)
         
     env.close()
+
+    plt.plot(list(range(len(rew))), rew)
+    plt.show()
