@@ -17,6 +17,7 @@ It is not meant as a good/effective learning example.
 
 """
 import sys, os
+sys.path.append(os.getcwd())
 import time
 import datetime
 import gym
