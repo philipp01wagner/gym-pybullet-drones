@@ -366,7 +366,7 @@ class BaseSingleAgentAviary(BaseAviary):
             # return obs
             ############################################################
             #### OBS SPACE OF SIZE 12
-            return np.hstack([obs[0:3], obs[7:10], obs[10:13], obs[13:16]]).reshape(12,)
+            return np.float32(np.hstack([obs[0:3], obs[7:10], obs[10:13], obs[13:16]]).reshape(12,))
             ############################################################
         else:
             print("[ERROR] in BaseSingleAgentAviary._computeObs()")
