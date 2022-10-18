@@ -4,6 +4,7 @@ import numpy as np
 import argparse
 from stable_baselines3 import A2C, PPO, DDPG, SAC, TD3
 from stable_baselines3.common.env_checker import check_env
+from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, VecMonitor
 import pybullet as p
 from gym_pybullet_drones.envs.single_agent_rl.StraightFlightAviary import StraightFlightAviary
 
@@ -61,11 +62,20 @@ if __name__ == "__main__":
                         )
 
     PYB_CLIENT = env.getPyBulletClient()
+    #env = DummyVecEnv([lambda: env])
+    # Automatically normalize the input features and reward
+    #env = VecNormalize(env, norm_obs=True, norm_reward=True)
+    #env = VecMonitor(env)
+    print("[INFO] Action space:", env.action_space)
+    print("[INFO] Observation space:", env.observation_space)
     p.setGravity(0,0,0)
     p.loadURDF("duck_vhacd.urdf", [1.0, 0, 0.2], p.getQuaternionFromEuler([0,0,0]), physicsClientId=PYB_CLIENT)
 
 
-    model = algorithm.load(policy_name)
+    print("TEST1")
+    model = algorithm.load(policy_name, env=env)
+    print("TEST2")
+
 
     #obs = env.reset()
     action = np.array([0,0])
@@ -84,6 +94,7 @@ if __name__ == "__main__":
         action, _states = model.predict(obs,
                                             deterministic=True
                                             )
+        
 
         print("X: ", obs[0])
         print("Reward: ", reward)
