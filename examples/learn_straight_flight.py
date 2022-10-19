@@ -32,6 +32,7 @@ from gym_pybullet_drones.envs.BaseAviary import DroneModel, Physics
 from gym_pybullet_drones.utils.utils import sync
 from gym.envs.registration import register
 from gym_pybullet_drones.utils.utils import sync, str2bool
+from wandb.integration.sb3 import WandbCallback
 
 
 def find_alg_name(alg):
@@ -98,7 +99,7 @@ if __name__ == "__main__":
                     verbose=1,
                     tensorboard_log="./a2c_StraightFlight_tensorboard/"
                     )
-    model.learn(total_timesteps=ARGS.timesteps) # Typically not enough
+    model.learn(total_timesteps=ARGS.timesteps, callback=WandbCallback()) # Typically not enough
 
     #### Show (and record a video of) the model's performance ##
     env = StraightFlightAviary(gui=ARGS.gui,
