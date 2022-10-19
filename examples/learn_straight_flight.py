@@ -122,7 +122,7 @@ if __name__ == "__main__":
                     learning_rate=ARGS.lr,
                     gamma=ARGS.gamma
                     )
-    model.learn(total_timesteps=ARGS.timesteps, callback=WandbCallback(), progress_bar=True) # Typically not enough
+    model.learn(total_timesteps=ARGS.timesteps, callback=WandbCallback()) # Typically not enough
 
     #### Show (and record a video of) the model's performance ##
     env = StraightFlightAviary(gui=ARGS.gui,
