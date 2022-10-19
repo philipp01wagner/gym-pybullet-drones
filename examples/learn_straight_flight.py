@@ -114,7 +114,6 @@ if __name__ == "__main__":
                                             deterministic=True
                                             )
 
-        print(action)
         obs, reward, done, info = env.step(action)
         #logger.log(drone=0,
         #           timestamp=i/env.SIM_FREQ,
@@ -123,7 +122,7 @@ if __name__ == "__main__":
         #           )
         if i%env.SIM_FREQ == 0:
             env.render()
-            print(done)
+
         sync(i, start, env.TIMESTEP)
         if done:
             obs = env.reset()
