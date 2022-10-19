@@ -32,6 +32,7 @@ from gym_pybullet_drones.envs.BaseAviary import DroneModel, Physics
 from gym_pybullet_drones.utils.utils import sync
 from gym.envs.registration import register
 from gym_pybullet_drones.utils.utils import sync, str2bool
+import wandb
 from wandb.integration.sb3 import WandbCallback
 
 
@@ -71,6 +72,20 @@ if __name__ == "__main__":
     reward_threshold=1.0,
     nondeterministic = False,
 )
+    
+
+    config = {
+        "policy_type": "MlpPolicy",
+        f"total_timesteps": {ARGS.timesteps},
+        "env_name": "haero",
+    }
+    run = wandb.init(
+        project="sb3",
+        config=config,
+        sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
+        monitor_gym=False,  # auto-upload the videos of agents playing the game
+        save_code=True,  # optional
+    )
 
     #### Check the environment's spaces ########################
     env = StraightFlightAviary(drone_model=ARGS.drone,
@@ -129,6 +144,8 @@ if __name__ == "__main__":
             obs = env.reset()
     env.close()
     #logger.plot()
+    
+    run.finish()
 
     
     timestring = datetime.datetime.now().strftime('%m_%d_%Y_%H_%M_%S') 
