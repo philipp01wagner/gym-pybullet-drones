@@ -47,7 +47,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Helix flight script using CtrlAviary or VisionAviary and DSLPIDControl')
     parser.add_argument('--drone',              default="ha",       type=DroneModel,    help='Drone model (default: CF2X)', metavar='', choices=DroneModel)
     parser.add_argument('--physics',            default="pyb",      type=Physics,       help='Physics updates (default: PYB)', metavar='', choices=Physics)
-    parser.add_argument('--gui',                default=False,       type=str2bool,     help='Whether to use PyBullet GUI (default: True)', metavar='')
+    parser.add_argument('--gui',                default=False,      type=str2bool,      help='Whether to use PyBullet GUI (default: True)', metavar='')
     parser.add_argument('--aggregate',          default=True,       type=str2bool,      help='Whether to aggregate physics steps (default: True)', metavar='')
     parser.add_argument('--simulation_freq_hz', default=240,        type=int,           help='Simulation frequency in Hz (default: 240)', metavar='')
     parser.add_argument('--control_freq_hz',    default=24,         type=int,           help='Control frequency in Hz (default: 48)', metavar='')
@@ -56,7 +56,9 @@ if __name__ == "__main__":
     parser.add_argument('--wind',               default=False,      type=str2bool,      help='Whether to enable wind (default: False)', metavar='')
     parser.add_argument('--record_video',       default=False,      type=str2bool,      help='Whether to record a video (default: False)', metavar='')
     parser.add_argument('--alg',                default="a2c",      type=str,           help='Which algorithm to use (default: A2C)', metavar='')
-    parser.add_argument('--timesteps',          default=1000,      type=int,           help='Number of training timesteps (default: 10.000)', metavar='')
+    parser.add_argument('--timesteps',          default=1000,       type=int,           help='Number of training timesteps (default: 10.000)', metavar='')
+    parser.add_argument('--lr',                 default=1e-3,       type=float,         help='learning rate', metavar='')
+    parser.add_argument('--gamma',              default=0.99,       type=float,         help='discount factor', metavar='')
 
     ARGS = parser.parse_args()
 
@@ -78,6 +80,9 @@ if __name__ == "__main__":
         "policy_type": "MlpPolicy",
         "total_timesteps": ARGS.timesteps,
         "env_name": "haero",
+        "learning_rate": ARGS.lr,
+        "algorithm": ARGS.alg,
+        "discount_factor": ARGS.gamma
     }
     run = wandb.init(
         project="haero_sb3",
@@ -112,9 +117,12 @@ if __name__ == "__main__":
     model = algorithm("MlpPolicy",
                     env,
                     verbose=1,
-                    tensorboard_log="./a2c_StraightFlight_tensorboard/"
+                    tensorboard_log="./a2c_StraightFlight_tensorboard/",
+                    device="cuda",
+                    learning_rate=ARGS.lr,
+                    gamma=ARGS.gamma
                     )
-    model.learn(total_timesteps=ARGS.timesteps, callback=WandbCallback()) # Typically not enough
+    model.learn(total_timesteps=ARGS.timesteps, callback=WandbCallback(), progress_bar=True) # Typically not enough
 
     #### Show (and record a video of) the model's performance ##
     env = StraightFlightAviary(gui=ARGS.gui,
