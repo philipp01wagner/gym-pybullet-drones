@@ -76,11 +76,11 @@ if __name__ == "__main__":
 
     config = {
         "policy_type": "MlpPolicy",
-        f"total_timesteps": {ARGS.timesteps},
+        "total_timesteps": ARGS.timesteps,
         "env_name": "haero",
     }
     run = wandb.init(
-        project="sb3",
+        project="haero_sb3",
         config=config,
         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
         monitor_gym=False,  # auto-upload the videos of agents playing the game
