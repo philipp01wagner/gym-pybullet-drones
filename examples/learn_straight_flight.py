@@ -32,6 +32,8 @@ from gym_pybullet_drones.envs.BaseAviary import DroneModel, Physics
 from gym_pybullet_drones.utils.utils import sync
 from gym.envs.registration import register
 from gym_pybullet_drones.utils.utils import sync, str2bool
+import wandb
+from wandb.integration.sb3 import WandbCallback
 
 
 def find_alg_name(alg):
@@ -45,7 +47,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Helix flight script using CtrlAviary or VisionAviary and DSLPIDControl')
     parser.add_argument('--drone',              default="ha",       type=DroneModel,    help='Drone model (default: CF2X)', metavar='', choices=DroneModel)
     parser.add_argument('--physics',            default="pyb",      type=Physics,       help='Physics updates (default: PYB)', metavar='', choices=Physics)
-    parser.add_argument('--gui',                default=False,       type=str2bool,     help='Whether to use PyBullet GUI (default: True)', metavar='')
+    parser.add_argument('--gui',                default=False,      type=str2bool,      help='Whether to use PyBullet GUI (default: True)', metavar='')
     parser.add_argument('--aggregate',          default=True,       type=str2bool,      help='Whether to aggregate physics steps (default: True)', metavar='')
     parser.add_argument('--simulation_freq_hz', default=240,        type=int,           help='Simulation frequency in Hz (default: 240)', metavar='')
     parser.add_argument('--control_freq_hz',    default=24,         type=int,           help='Control frequency in Hz (default: 48)', metavar='')
@@ -54,7 +56,9 @@ if __name__ == "__main__":
     parser.add_argument('--wind',               default=False,      type=str2bool,      help='Whether to enable wind (default: False)', metavar='')
     parser.add_argument('--record_video',       default=False,      type=str2bool,      help='Whether to record a video (default: False)', metavar='')
     parser.add_argument('--alg',                default="a2c",      type=str,           help='Which algorithm to use (default: A2C)', metavar='')
-    parser.add_argument('--timesteps',          default=100000,      type=int,           help='Number of training timesteps (default: 10.000)', metavar='')
+    parser.add_argument('--timesteps',          default=1000,       type=int,           help='Number of training timesteps (default: 10.000)', metavar='')
+    parser.add_argument('--lr',                 default=1e-3,       type=float,         help='learning rate', metavar='')
+    parser.add_argument('--gamma',              default=0.99,       type=float,         help='discount factor', metavar='')
 
     ARGS = parser.parse_args()
 
@@ -70,6 +74,23 @@ if __name__ == "__main__":
     reward_threshold=1.0,
     nondeterministic = False,
 )
+    
+
+    config = {
+        "policy_type": "MlpPolicy",
+        "total_timesteps": ARGS.timesteps,
+        "env_name": "haero",
+        "learning_rate": ARGS.lr,
+        "algorithm": ARGS.alg,
+        "discount_factor": ARGS.gamma
+    }
+    run = wandb.init(
+        project="haero_sb3",
+        config=config,
+        sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
+        monitor_gym=True,  # auto-upload the videos of agents playing the game
+        save_code=True,  # optional
+    )
 
     #### Check the environment's spaces ########################
     env = StraightFlightAviary(drone_model=ARGS.drone,
@@ -97,9 +118,11 @@ if __name__ == "__main__":
                     env,
                     verbose=1,
                     tensorboard_log="./a2c_StraightFlight_tensorboard/",
-                    device='cuda'
+                    device="cuda",
+                    learning_rate=ARGS.lr,
+                    gamma=ARGS.gamma
                     )
-    model.learn(total_timesteps=ARGS.timesteps) # Typically not enough
+    model.learn(total_timesteps=ARGS.timesteps, callback=WandbCallback()) # Typically not enough
 
     #### Show (and record a video of) the model's performance ##
     env = StraightFlightAviary(gui=ARGS.gui,
@@ -123,12 +146,14 @@ if __name__ == "__main__":
         #           )
         if i%env.SIM_FREQ == 0:
             env.render()
-            print(done)
+
         sync(i, start, env.TIMESTEP)
         if done:
             obs = env.reset()
     env.close()
     #logger.plot()
+    
+    run.finish()
 
     
     timestring = datetime.datetime.now().strftime('%m_%d_%Y_%H_%M_%S') 

@@ -7,9 +7,9 @@ setup(name='gym_pybullet_drones',
         'Pillow',
         'matplotlib',
         'cycler',
-        'gym',
+        'gym==0.21.0',
         'pybullet',
-        'stable_baselines3',
+        'stable_baselines3==1.6.0',
         'ray[rllib]'
         ]
 )
