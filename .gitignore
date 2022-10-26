@@ -432,3 +432,5 @@ TSWLatexianTemp*
 examples/a2c_StraightFlight_tensorboard/
 logs_colab/
 *.zip
+
+./Dockerfile
