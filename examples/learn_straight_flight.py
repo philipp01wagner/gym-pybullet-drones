@@ -54,7 +54,7 @@ if __name__ == "__main__":
     parser.add_argument('--wind',               default=False,      type=str2bool,      help='Whether to enable wind (default: False)', metavar='')
     parser.add_argument('--record_video',       default=False,      type=str2bool,      help='Whether to record a video (default: False)', metavar='')
     parser.add_argument('--alg',                default="a2c",      type=str,           help='Which algorithm to use (default: A2C)', metavar='')
-    parser.add_argument('--timesteps',          default=1000,      type=int,           help='Number of training timesteps (default: 10.000)', metavar='')
+    parser.add_argument('--timesteps',          default=100000,      type=int,           help='Number of training timesteps (default: 10.000)', metavar='')
 
     ARGS = parser.parse_args()
 
@@ -96,7 +96,8 @@ if __name__ == "__main__":
     model = algorithm("MlpPolicy",
                     env,
                     verbose=1,
-                    tensorboard_log="./a2c_StraightFlight_tensorboard/"
+                    tensorboard_log="./a2c_StraightFlight_tensorboard/",
+                    device='cuda'
                     )
     model.learn(total_timesteps=ARGS.timesteps) # Typically not enough
 
@@ -114,7 +115,6 @@ if __name__ == "__main__":
                                             deterministic=True
                                             )
 
-        print(action)
         obs, reward, done, info = env.step(action)
         #logger.log(drone=0,
         #           timestamp=i/env.SIM_FREQ,
